@@ -1,0 +1,281 @@
+#####################
+# Traversal
+# Depth first, Breadth first
+#####################
+
+               D
+            /     \
+           B        E
+          /  \        \
+        A     C         F
+
+BFS = level order traversal
+    D,B,E,A,C,F
+
+DFS:
+    pre-order
+        查看這個 node 內容, 再你 traversal 之 "前"
+        D,B,A,C,E,F
+
+
+    In-order: 大方向看這個tree, node 是從左讀到右的, 不管上上下下的話
+        直到我們碰到第一個left left, 才查看這個 node
+
+        A,B,C,D,E,F
+
+    post-order
+
+        traversal 之 "後" 才 check node
+        A,C,B,F,E,D,
+
+
+
+##############
+# Binary Tree (BT)
+##############
+Binary Tree with n nodes
+Rule: 一個parent 有一個或兩個 child,
+
+    Search O(n), 需要搜尋完所有的node
+        可以找任一個traversal 去做search
+    Delete O(n), 需要搜尋完所有的node
+        被delete 的那個人, 可以從最下面leaf 找一個上來補
+    Insert(height of tree) = O(logn)
+        找到leaf 就可以插進去
+
+        if a Binary Complete Tree with total n nodes.
+            n = 1 + 2 + 4 + ... + 2^(h-1) + 2^h = 2^(h+1) - 1
+            n = 2^(h+1) -1
+            h = ?,    logn = (h+1)log2 -1 => h = logn
+
+
+
+
+#########################
+# Binary Search Tree (BST)
+# *** Insert, Search , Delete 平均case 都是 O(logn)
+#########################
+Rule: Sorted binary tree, 左邊小於parent, 右邊大於parent
+
+
+               5
+            /     \
+           3        7
+          /  \     /  \
+        1     4    6     9
+
+# avg case : complete binary tree
+
+            5
+             \
+              10
+                \
+                 15
+                  \
+                   25
+
+# worst case: unbalanced or skew binary tree
+
+
+
+    Search, avg case O(logn), worst case O(n)
+        由於tree 已經 sorted 過, 跟著往左往右search 下去, 只需要 height of tree, O(logn)
+    Insert, avg case O(logn), worst case O(n)
+        理由同上
+    Delete 也是比較麻煩,
+
+#########################
+# BST Insert(new_value):
+#########################
+    //while version
+    **idea:
+        1.如果沒有root, Node(new_value) 設定成root, return
+        while True:
+            2.有 curnode = root, 就一直compare node.value,
+                case1: 值相等
+                    a.直接overwrite 原來node
+                    b.或用counter ++ 來紀錄
+                    c.或用list 來append, 因為這個value 可能只是key
+                    BREAK
+                case2: insert 值 小於 current node, 因此
+                    a. 如果 current node 有左child, curnode = curnode.left, 繼續往左
+                    b. 如果 沒有左child 了, 那就是代表要insert here. curnode.left = newnode, BREAK
+                case3: 同 case2, 只是大於往右
+
+    code:
+        def insert_with_loop(self,new_value):
+
+            if self.root == None:
+                self.set_root(new_value)
+                return
+
+            node = self.root
+            new_node = Node(new_value)
+
+            while (True):
+                comparison = self.compare(node, new_node)
+                if comparison == 0:
+                    # override with new node's value
+                    node.set_value(new_node.get_value())
+                    break # override node, and stop looping
+                elif comparison == -1:
+                    # go left
+                    if node.has_left_child():
+                        node = node.get_left_child()
+                    else:
+                        node.set_left_child(new_node)
+                        break #inserted node, so stop looping
+                else: #comparison == 1
+                    # go right
+                    if node.has_right_child():
+                        node = node.get_right_child()
+                    else:
+                        node.set_right_child(new_node)
+                        break # inserted node, so stop looping
+
+    //recursive ver, 基本上概念一樣, 就是多一個helper fun 往下call, 沒child 就直接assign and break
+    code:
+        def insert_with_recursion(self,value):
+            if self.get_root() == None:
+                self.set_root(value)
+                return
+            #otherwise, use recursion to insert the node
+            self.insert_recursively(self.get_root(), Node(value))
+
+        def insert_recursively(self,node, new_node):
+            #概念跟 iteration 差不多
+            comparison = self.compare(node,new_node)
+            if comparison == 0:
+                # equal, 就直接assign new_node as root
+                node.set_value(new_node.get_value())
+            elif comparison == -1:
+                # traverse left
+                # 如果有 left child, 那再繼續往下call
+                if node.has_left_child():
+                    self.insert_recursively(node.get_left_child(),new_node)
+                else:#如果已經是盡頭了, 那就是set new_node 到 node left
+                    node.set_left_child(new_node)
+            else: #comparison == 1
+                # traverse right
+                if node.has_right_child():
+                    self.insert_recursively(node.get_right_child(), new_node)
+                else:
+                    node.set_right_child(new_node)
+
+
+#########################
+# BST Search(new_value):
+#########################
+Idea: 同 insert, 差在, insert 是最後沒child 時, 插入new node, 而 search 是return False
+
+        def search(self,value):
+            #基本上就跟insert 一樣, compare 相同時
+            #return true, 然後, 走到null 時, 不必assign new_node,
+            #而是return False
+
+            node = self.get_root()
+            s_node = Node(value)
+
+            while (True):
+                comparison = self.compare(node, s_node)
+                if comparison == 0:
+                    return True
+                elif comparison == -1:#go left
+                    if node.has_left_child():
+                        node = node.get_left_child()
+                    else:
+                        return False
+                else: #== 1#go right
+                    if node.has_right_child():
+                        node = node.get_right_child()
+                    else:
+                        return False
+
+
+
+
+
+
+#########################
+# BST Delete(new_value):
+#########################
+Delete the node which has...
+case1: leaf node
+case2: node has 1 child node
+case3: node has 2 child nodes
+
+    code:
+        def minValueNode(self, node):
+            current = node
+
+            # loop down to find the leftmost leaf
+            while(current.left is not None):
+                current = current.left
+
+            return current
+
+        def delete(self,node,key):
+            #input , root, key
+            #return the root of new tree (這個tree 就是以node為root的tree, 對於每個階層就是sub tree)
+
+            #base case
+            if node == None:
+                return node
+
+
+            #go left or right to find the delete key
+            # 如果這個node 不是 key, 那就看是往左還是往右
+            if key < node.value:
+                # 想法是: 當前的node.left 要接上誰呢？
+                # 看看以 node.left 為root 的子樹, 刪完key後, 這個子樹
+                # 的 root 回傳上來讓 node.left 接
+
+                #簡單說, 現在我知道 key 在node 左邊
+                #肯定往左邊要刪一個, 那我之後的 node.left 要接上誰呢？ 你回傳給我
+                # 如果一直call 下去都沒找到key, base case 會return None, 則上一層 node.left = None
+                # 保持原狀
+                node.left = self.delete(node.left,key)
+
+            elif key > node.value:
+                node.right = self.delete(node.right,key)
+
+            else: # key == node.value, 要刪
+
+                #刪除有3個case 要討論, 但主要idea 就是決定回傳誰,去給上一層的parent 接
+
+                ##############
+                # case 1, 2
+                ##############
+                # child with only one child or no child = leaf
+                # 因為當下這個node 即將被刪除, 他左或是右child 有一個要留下
+                # 當然如果都沒有左右child , 下直接進第一個if, 把 tmp = node.right = None return 上去
+
+                #左邊null, 回傳右邊
+                if node.left is None:
+                    tmp = node.right
+                    #delete node
+                    node = None
+                    return tmp #return 給上層 node.left or node.right 去接, 因此救活了node的child (與parent 相連了)
+                elif node.right is None:
+                    tmp = node.left
+                    node = None
+                    return tmp #return tmp 上去表示, 這層的node 就是key, 他的左邊還有人, 往parent 接
+
+                ##############
+                # case 3, 兩個child
+                ##############
+                # Rule: 往右子樹中, 找最小值, 也就是往他的右子數中最左邊的nodeMin 找到後, 取代被刪除的node
+                # 因為這個 nodeMin , 就是比剛才被刪除的node 次大一個的node, 把它拉上來取代, 其他的結構都不用動, 大小關係還是維持
+
+                nodeMin = self.minValueNode(node.right)
+                #取代了
+                node.value = nodeMin.value
+
+                #上面等於把 nodeMin 往上拉了, 之後把nodeMin刪了
+                node.right = self.delete(node.right,nodeMin.value)
+
+            return node
+
+
+
+.
