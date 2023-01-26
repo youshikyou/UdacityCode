@@ -1,0 +1,16 @@
+{
+    "name": "flightsurety",
+    "version": "1.0.0",
+    "description": "",
+    "license": "MIT",
+    "scripts": {
+        "test": "truffle test ./test/flightSurety.js"
+    },
+    "devDependencies": {
+        "web3": "^1.7.1"
+    },
+    "dependencies": {
+        "openzeppelin-solidity": "^4.5.0",
+        "truffle-assertions": "^0.9.2"
+    }
+}
