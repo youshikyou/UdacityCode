@@ -1,0 +1,13 @@
+{
+    "name": "supply-chain",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "keywords": [],
+    "license": "MIT",
+    "dependencies": {
+        "@truffle/hdwallet-provider": "^2.0.3",
+        "dotenv": "^16.0.0",
+        "truffle-assertions": "^0.9.2"
+    }
+}
