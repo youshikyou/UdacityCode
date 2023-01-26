@@ -1,0 +1,23 @@
+HeapSort
+
+The main steps in a heapsort are:
+
+1.Convert the array into a maxheap (a complete binary tree with decreasing values)
+
+
+    複習一下
+    Data structure: Heap
+    必須滿足
+        1. complete binary tree (CBT)
+        2. Heap Order Property (加上自訂的 priority 設定, ex: min-Heap,  就是 parent 一定 < child)
+
+
+
+2.Swap the top element with the last element in the array (putting it in it's correct final position)
+3.Repeat with arr[:len(arr)-1] (all but the sorted elements)
+
+
+
+其實不用重寫一個 heap.insert remove , 雖然這樣可以
+
+只要寫一個 downheapfiy , 然後想要移動的人就去call downheapfiy, 移一次如果不夠, 裡面要再recursive call 下去
