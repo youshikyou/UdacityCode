@@ -1,0 +1,60 @@
+Parameters:
+# whatever you consider a changing value, put it as a parameter instead of hard-coding it into your script
+Resources:
+  #instace profile contains the IAM Role name(s) that we want to associate to our auto scaling EC2 Servers
+  ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Roles:
+        - UdacityS3ReadOnlyEC2
+          #!/bin/bash
+          apt-get update -y
+          apt-get install unzip awscli -y
+          apt-get install apache2 -y
+          systemctl start apache2.service
+          cd /var/www/html
+          aws s3 cp s3://udacity-demo-1/udacity.zip .
+          unzip -o udacity.zip
+# Docker Installation
+   apt-get udpate
+   apt-get install -y apt-transport-https ca-certificates curl 
+
+
+
+# There are three resources involved when assigning permissions to an EC2 instance:
+# “InstanceProfile” – You can’t assign an IAM role directly to the EC2 instance, but you can assign an instance profile, which passes role information to the EC2 instance.
+# “IAM::Role” – The EC2 instance can assume a role and inherit any permissions from the role, via the instance profile.
+# “IAM::Policy” – This contains the actual permissions. The policy is associated with the role.
+ProfileWithRolesForOurApp:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref S3WritableRole
+  S3ReadableRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+  RolePolicies:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - SFTPGatewayInstance
+    Properties:
+      PolicyName: SFTPGatewayInstancePolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: '- s3:List*'
+            Resource: '*'
+      Roles:
+        - !Ref S3ReadableRole
+  Outputs: 
+  #Bonus points for useful outputs!

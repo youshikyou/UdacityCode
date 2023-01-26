@@ -1,0 +1,19 @@
+ [ {
+    "ParameterKey": "EnvironmentName",
+    "ParameterValue": "UdacityDevopsNanodegree"
+  },
+  
+  {
+    "ParameterKey": "ImageId",
+    "ParameterValue": "ami-087855b6c8b59a9e4" 
+  },
+
+  {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t2.medium"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "bastionkeypair"
+  }
+]
